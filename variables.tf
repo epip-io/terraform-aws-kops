@@ -174,3 +174,13 @@ variable "nodes_min_size" {
   type        = number
   default     = 1
 }
+
+variable "private_subnet_format" {
+    type = string
+    default = "%s-private-%s"
+}
+
+variable "utility_subnet_format" {
+    type = string
+    default = "%s-public-%s"
+}

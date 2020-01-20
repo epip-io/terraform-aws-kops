@@ -2,11 +2,22 @@ data "aws_route53_zone" "this" {
   zone_id = var.dns_zone
 }
 
+module "label" {
+  source      = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.14.0"
+  attributes  = var.attributes
+  namespace   = var.namespace
+  environment = var.environment
+  stage       = var.stage
+  delimiter   = var.delimiter
+  name        = var.name
+  tags        = var.tags
+}
+
 locals {
   name = format("%s.%s", var.region, data.aws_route53_zone.this.name)
   private_subnets = [
     for az in var.azs : {
-      name   = format("%s-private-%s", var.name, az)
+      name   = format(var.private_subnet_format, label.id, az)
       id     = element(var.private_subnets, index(var.azs, az))
       zone   = az
       cidr   = element(var.private_subnets_cidr_blocks, index(var.azs, az))
@@ -18,7 +29,7 @@ locals {
 
   utility_subnets = [
     for az in var.azs : {
-      name = format("%s-utility-%s", var.name, az)
+      name = format(var.utility_subnet_format, label.id, az)
       id   = element(var.utility_subnets, index(var.azs, az))
       zone = az
       cidr = element(var.utility_subnets_cidr_blocks, index(var.azs, az))
