@@ -13,7 +13,7 @@ module "label" {
 }
 
 locals {
-  name = data.aws_route53_zone.this.name
+  name = trimsuffix(data.aws_route53_zone.this.name, ".")
   private_subnets = [
     for az in var.azs : {
       name   = format(var.private_subnet_format, module.label.id, az)
